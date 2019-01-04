@@ -1,0 +1,407 @@
+package wdmethods;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.Select;
+
+public class SeMethods implements WdMethods {
+
+	RemoteWebDriver driver = null;
+	@Override
+	public void startApp(String browser, String url) {
+
+		if (browser.equalsIgnoreCase("chrome")) {
+			System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
+			driver = new ChromeDriver();
+		} else if(browser.equalsIgnoreCase("firefox")) {
+			System.setProperty("webdriver.gecko.driver", "./drivers/geckodriver.exe");
+			driver = new FirefoxDriver();
+		}
+		driver.get(url);
+		driver.manage().window().maximize();
+		System.out.println("The browser "+browser+" launched successfully");
+	}
+
+	@Override
+	public WebElement locateElement(String locator, String locValue) {
+		try {
+			switch (locator) {
+			case "id": return driver.findElementById(locValue); 
+			case "class": return  driver.findElementByClassName(locValue);
+			case "tagName": return driver.findElementByTagName(locValue);
+			case "linkText": return driver.findElementByLinkText(locValue);
+			case "xpath" : return driver.findElementByXPath(locValue);
+			case "cssSelector" : return driver.findElementByCssSelector(locValue);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public WebElement locateElement(String locValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void type(WebElement ele, String data) {
+		try {
+			ele.clear();
+			ele.sendKeys(data);	
+			System.out.println("The data "+data+" entered successfully");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void click(WebElement ele) {
+		ele.click();
+		System.out.println("The element "+ele+ "click successfully");
+	}
+
+	@Override
+	public String getText(WebElement ele) {
+		String text=ele.getText();
+		System.out.println("The element clicked successfully" +ele);
+		return text;
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void selectDropDownUsingText(WebElement ele, String value) {
+		Select sel = new Select(ele);
+		sel.selectByVisibleText(value);
+		System.out.println("The value "+value+" entered successfully");
+	}
+
+	@Override
+	public void selectDropDownUsingIndex(WebElement ele, int index) {
+		Select sel = new Select (ele);
+		sel.selectByIndex(index);
+		System.out.println("The value is:"+index);
+	}
+
+	@Override
+	public boolean verifyTitle(String expectedTitle) {
+		String actualTitle = driver.getTitle();
+		if(actualTitle.equals(expectedTitle)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	@Override
+	public void verifyExactText(WebElement ele, String expectedText) {
+		// TODO Auto-generated method stub
+		String text=ele.getText();
+		if(text.equals(expectedText)) {
+			System.out.println("Text displayed correctly" +ele);
+		}
+		else {
+			System.out.println("Text is not displayed correctly");
+		}
+
+	}
+
+	@Override
+	public void verifyPartialText(WebElement ele, String expectedText) {
+		// TODO Auto-generated method stub
+		String text=ele.getText();
+		if(text.contains(expectedText)) {
+			System.out.println("Text displayed correctly" +ele);
+		}
+		else {
+			System.out.println("Text is not displayed correctly");
+		}
+
+
+	}
+
+	@Override
+	public void verifyExactAttribute(WebElement ele, String attribute, String value) {
+		// TODO Auto-generated method stub
+		String attribute1 = ele.getAttribute(attribute);
+		if(attribute1.equalsIgnoreCase(value)) {
+			System.out.println("Attribute displayed succesfully" +attribute1);
+		}
+		else {
+			System.out.println("attribute not displayed");
+		}
+
+	}
+
+	@Override
+	public void verifyPartialAttribute(WebElement ele, String attribute, String value) {
+		// TODO Auto-generated method stub
+		String attribute2 = ele.getAttribute(attribute);
+		if(attribute2.contains(value)) {
+			System.out.println("Attribute for partial text displayed successfully" +attribute2);
+		}
+		else {
+			System.out.println("attribute not displayed");
+		}
+
+	}
+
+	@Override
+	public void verifySelected(WebElement ele) {
+		// TODO Auto-generated method stub
+		if(ele.isSelected()) {
+			System.out.println("Element is Selected" +ele );
+		}
+		else {
+			System.out.println("Element is not selected");
+		}
+
+	}
+
+	@Override
+	public void verifyDisplayed(WebElement ele) {
+		// TODO Auto-generated method stub
+		if(ele.isDisplayed()) {
+			System.out.println("Element is displayed" +ele);
+		}
+		else {
+			System.out.println("Element is not displayed");
+		}
+
+	}
+
+	@Override
+	public void switchToWindow(int index) {
+		// TODO Auto-generated method stub
+		Set<String> allWindows = driver.getWindowHandles();
+		List<String> window = new ArrayList<String>();
+		window.addAll(allWindows);
+		driver.switchTo().window(window.get(index));
+	}
+
+	@Override
+	public void switchToFrame(WebElement ele) {
+		// TODO Auto-generated method stub
+		driver.switchTo().frame(ele);
+
+	}
+
+	@Override
+	public void acceptAlert() {
+		// TODO Auto-generated method stub
+		driver.switchTo().alert().accept();
+
+	}
+
+	@Override
+	public void dismissAlert() {
+		// TODO Auto-generated method stub
+		driver.switchTo().alert().dismiss();
+
+	}
+
+	@Override
+	public String getAlertText() {
+		// TODO Auto-generated method stub
+		String text = driver.switchTo().alert().getText();
+		return text;
+	}
+
+	@Override
+	public void takeSnap() {
+		// TODO Auto-generated method stub
+		File src = driver.getScreenshotAs(OutputType.FILE);
+		File dec = new File ("./snaps/img.jpg");
+		try {
+			FileUtils.copyFile(src, dec);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void closeBrowser() {
+		driver.close();
+	}
+
+	@Override
+	public void closeAllBrowsers() {
+		driver.quit();
+	}
+
+}
+
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite" verbose="5">
+	<parameter name="browser" value="chrome"></parameter>
+	<parameter name="url" value="http://leaftaps.com/opentaps"></parameter>
+	<parameter name="uname" value="DemoSalesManager"></parameter>
+	<parameter name="pwd" value="crmsfa"></parameter> 
+	<test thread-count="5" name="Test">
+		<classes>
+			<class name="week3.day2.Tc002_CreateLead" />
+		</classes>
+	</test> <!-- Test -->
+</suite> <!-- Suite -->
+
+
+
+
+
+package wdmethods;
+
+import org.testng.annotations.Test;
+
+import wdmethods.SeMethods;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.AfterSuite;
+
+public class ProjSpecificMethods extends SeMethods {
+	public ChromeDriver driver;
+	public void f() {
+		System.out.println("LearnAnnotations");
+	}
+	@BeforeMethod
+	public void beforeMethod() {
+		startApp("chrome", "http://leaftaps.com/opentaps");
+		WebElement eleUsername = locateElement("id", "username");
+		type(eleUsername, "DemoSalesManager");
+		WebElement elePassword = locateElement("id", "password");
+		type(elePassword, "crmsfa");
+		WebElement eleLogin = locateElement("class", "decorativeSubmit");
+		click(eleLogin);
+		WebElement eleCrmsfa = locateElement("linkText", "CRM/SFA");
+		click(eleCrmsfa);
+		WebElement eleLeads = locateElement("linkText", "Leads");
+		click(eleLeads);
+		WebElement eleCl = locateElement("linkText","Create Lead");
+		click(eleCl);
+		
+	}
+
+	@AfterMethod
+	public void afterMethod() {
+		closeAllBrowsers();
+	}
+
+	@BeforeClass
+	public void beforeClass() {
+		System.out.println("BeforeClass");
+	}
+
+	@AfterClass
+	public void afterClass() {
+		System.out.println("AfterClass");
+	}
+
+	@BeforeTest
+	public void beforeTest() {
+		System.out.println("before test");
+	}
+
+	@AfterTest
+	public void afterTest() {
+		System.out.println("After test");
+	}
+
+	@BeforeSuite
+	public void beforeSuite() {
+		System.out.println("beforeSuite");
+	}
+
+	@AfterSuite
+	public void afterSuite() {
+		System.out.println("AferSuite");
+	}
+
+}
+
+
+
+
+
+dependencies {
+
+		// https://mvnrepository.com/artifact/com.aventstack/extentreports
+		compile group: 'com.aventstack', name: 'extentreports', version: '3.1.5'
+	
+		// https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+		compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.13.0'
+
+		// https://mvnrepository.com/artifact/org.testng/testng
+		compile group: 'org.testng', name: 'testng', version: '6.14.2'
+	
+		// https://mvnrepository.com/artifact/junit/junit
+		compile group: 'junit', name: 'junit', version: '4.12'
+	
+		// https://mvnrepository.com/artifact/org.apache.poi/poi
+		compile group: 'org.apache.poi', name: 'poi', version: '3.17'
+	
+		// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+		compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
+	
+		// https://mvnrepository.com/artifact/commons-io/commons-io
+		compile group: 'commons-io', name: 'commons-io', version: '2.6'
+	
+		// https://mvnrepository.com/artifact/org.apache.commons/commons-io
+		compile group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
+	
+		// https://mvnrepository.com/artifact/io.cucumber/cucumber-junit
+		compile group: 'io.cucumber', name: 'cucumber-junit', version: '3.0.2'
+	
+		// https://mvnrepository.com/artifact/io.cucumber/cucumber-java
+		compile group: 'io.cucumber', name: 'cucumber-java', version: '3.0.2'
+
+		// https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+		compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
+
+	    // This dependency is exported to consumers, that is to say found on their compile classpath.
+    	api 'org.apache.commons:commons-math3:3.6.1'
+
+	    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+	    implementation 'com.google.guava:guava:23.0'
+
+    	// Use JUnit test framework
+	    testImplementation 'junit:junit:4.12'
+}
+
+test{
+	useTestNG(){
+		suites 'Tc001CreateLead.xml'
+	}
+}
+
+sourceSets{
+	test.java.srcDir 'src/main/java'
+}
